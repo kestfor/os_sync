@@ -44,7 +44,18 @@ queue_t* queue_init(int max_count) {
 }
 
 void queue_destroy(queue_t *q) {
-	// TODO: It's needed to implement this function
+    int err = pthread_cancel(q->qmonitor_tid);
+    if (err != 0) {
+        perror("pthread_cancel failed");
+        abort();
+    }
+
+    qnode_t *curr = q->first;
+    while (curr != NULL) {
+        qnode_t *next = curr->next;
+        free(curr);
+        curr = next;
+    }
 }
 
 int queue_add(queue_t *q, int val) {
